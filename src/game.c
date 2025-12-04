@@ -7,11 +7,11 @@ Player gPlayer; // appel du joueur global
 // ******************************************
 //
 
-static bool TileContains(const Tile *t, int texIndex)
+static bool TileContains(const Tile *t, int texIndex) //fonction bool pour vérifier si une texture précise est présente dans une tuile
 {
-    for (int i = 0; i < t->layerCount; i++)
+    for (int i = 0; i < t->layerCount; i++) //parcours toute les couches de la tuile
     {
-        if (t->layers[i] == texIndex)
+        if (t->layers[i] == texIndex)  //si l'index de la couche correspond à l'index recherché la fonction renvoie true 
             return true;
     }
     return false;
@@ -101,7 +101,7 @@ void GameInit(Board *board)
         }
     }
 
-    gPlayer.x = 1; // par exemple départ en (1,1)
+    gPlayer.x = 1; // départ en (1,1)
     gPlayer.y = 1;
     gPlayer.textureIndex = 3; // correspond à la texture knight
 
@@ -133,7 +133,7 @@ void GameUpdate(Board *board, float dt)
             }
         }
 
-    int nextX = gPlayer.x;
+    int nextX = gPlayer.x;  //va récupérer la position actuelle du joueur en x
     int nextY = gPlayer.y;
 
     // déplacement proposé
@@ -146,14 +146,14 @@ void GameUpdate(Board *board, float dt)
     else if (IsKeyPressed(KEY_S) || IsKeyPressed(KEY_DOWN))
         nextY++;
 
-    // limites du board
+    // limites du board pour ne pas sortir de l'écran
     if (nextX < 0 || nextX >= BOARD_COLS || nextY < 0 || nextY >= BOARD_ROWS)
         return;
 
     // récupère la tile cible
     Tile *target = &board->tiles[nextY][nextX];
 
-    // collision mur (mur = index 1)
+    // appel de la fonction de vérification des tuiles et si la tuile cible est égale à 1 c'est alors un mur
     if (TileContains(target, 1))
     {
         // collision → on ne bouge pas
