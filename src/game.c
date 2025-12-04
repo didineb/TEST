@@ -72,9 +72,6 @@ void GameInit(Board *board)
                 TilePush(t, 0);
                 TilePush(t, 3);
             }
-            board->player.x = 1 * TILE_SIZE;
-            board->player.y = 1 * TILE_SIZE;
-            board->player.speed = 150;
 
             
 
