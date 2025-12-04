@@ -3,7 +3,6 @@
 extern Texture2D gTileTextures[];
 extern int gTileTextureCount;
 
-
 // ******************************************
 //
 
@@ -64,13 +63,14 @@ void GameInit(Board *board)
             Tile *t = &board->tiles[y][x];
             TileClear(t);
 
-            if (maze[x][y] == 1)
+            if (maze[y][x] == 1)
             {
                 TilePush(t, 1);
             }
-            else if (maze[x][y] == 0)
+            else if (maze[y][x] == 0)
             {
                 TilePush(t, 0);
+                TilePush(t, 3);
             }
             board->player.x = 1 * TILE_SIZE;
             board->player.y = 1 * TILE_SIZE;
