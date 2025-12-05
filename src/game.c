@@ -110,19 +110,35 @@ void GameInit(Board *board)
 
 void GameUpdate(Board *board, float dt)
 {
+    // Durée minimale entre deux mouvements (en secondes)
+    float moveDelay = 0.15f;
+    static float lastMoveTime = 0.0f;
 
+    float now = GetTime();   // temps en secondes depuis le lancement
     int nextX = gPlayer.x;  //va récupérer la position actuelle du joueur en x
     int nextY = gPlayer.y;
 
-    // système de déplacement au clavier
-    if (IsKeyPressed(KEY_D) || IsKeyPressed(KEY_RIGHT))
+   // On agit seulement si le délai est écoulé
+if (now - lastMoveTime >= moveDelay)
+{
+    if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
         nextX++;
-    else if (IsKeyPressed(KEY_A) || IsKeyPressed(KEY_LEFT))
+        lastMoveTime = now;
+    }
+    else if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
         nextX--;
-    else if (IsKeyPressed(KEY_W) || IsKeyPressed(KEY_UP))
+        lastMoveTime = now;
+    }
+    else if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
         nextY--;
-    else if (IsKeyPressed(KEY_S) || IsKeyPressed(KEY_DOWN))
+        lastMoveTime = now;
+    }
+    else if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
         nextY++;
+        lastMoveTime = now;
+    }
+}
+
 
     // limites du board pour ne pas sortir de l'écran
     if (nextX < 0 || nextX >= BOARD_COLS || nextY < 0 || nextY >= BOARD_ROWS)
