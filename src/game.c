@@ -111,6 +111,11 @@ void GameInit(Board *board)
 void GameUpdate(Board *board, float dt)
 {
 
+    // Durée minimale entre deux mouvements (en secondes)
+    float moveDelay = 0.15f;
+    static float lastMoveTime = 0.0f;
+
+    float now = GetTime();   // temps en secondes depuis le lancement
     int nextX = gPlayer.x;  //va récupérer la position actuelle du joueur en x
     int nextY = gPlayer.y;
 
