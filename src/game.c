@@ -115,6 +115,7 @@ void GameInit(Board *board)
 
     gTrophe.x = 29;
     gTrophe.y = 16;
+    gTrophe.victoire = 0;
     gTrophe.textureIndex = 5;
 
     TilePush(&board->tiles[gTrophe.y][gTrophe.x], 5);
@@ -187,7 +188,9 @@ void GameUpdate(Board *board, float dt)
         return;
     }
     if (TileContains(target, 5)){
-        GameInit(board);
+        gTrophe.victoire += 1;
+        gPlayer.y = 1;
+        gPlayer.x = 1;
         return;
     }
 
