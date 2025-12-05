@@ -38,7 +38,7 @@ static bool TilePush(Tile *t, int texIndex)
 
 static int TilePop(Tile *t)
 {
-    if (t->layerCount <= 0)
+    if (t->layerCount <= 0) 
         return -1;
     int tex = t->layers[--t->layerCount];
     t->layers[t->layerCount] = -1;
@@ -91,11 +91,11 @@ void GameInit(Board *board)
             Tile *t = &board->tiles[y][x];
             TileClear(t);
 
-            if (maze[y][x] == 1)
+            if (maze[y][x] == 1) // si la case est un mur
             {
                 TilePush(t, 1);
             }
-            else if (maze[y][x] == 0)
+            else if (maze[y][x] == 0) //si la case est un sol
             {
                 TilePush(t, 0);
             }
@@ -141,7 +141,7 @@ if (now - lastMoveTime >= moveDelay)
 
 
     // limites du board pour ne pas sortir de l'écran
-    if (nextX < 0 || nextX >= BOARD_COLS || nextY < 0 || nextY >= BOARD_ROWS)
+    if (nextX < 0 || nextX >= BOARD_COLS || nextY < 0 || nextY >= BOARD_ROWS) 
         return;
 
     // récupère la tile cible
@@ -161,12 +161,19 @@ if (now - lastMoveTime >= moveDelay)
 
 void GameDraw(const Board *board)
 {
-
-    for (int y = 0; y < BOARD_ROWS; y++)
+    for (int y = 0; y < BOARD_ROWS; y++) //parcours toutes les lignes
     {
-        for (int x = 0; x < BOARD_COLS; x++)
+        for (int x = 0; x < BOARD_COLS; x++) //parcours toutes les colonnes
         {
-            const Tile *t = &board->tiles[y][x];
+            const Tile *t = &board->tiles[y][x]; //récupère la tuile actuelle
+
+            // dessine le joueur au-dessus de tout
+            DrawTexture(
+                gTileTextures[gPlayer.textureIndex], //récupère la texture du joueur
+                gPlayer.x * TILE_SIZE, // position x en cases car multiplié par la taille d'une tuile
+                gPlayer.y * TILE_SIZE,
+                WHITE); //tint = filtre de couleur | WHITE signifie : dessiner l’image normalement.
+
 
             // fond “vide” au cas où
             DrawRectangle(
@@ -177,12 +184,12 @@ void GameDraw(const Board *board)
                 LIGHTGRAY);
 
             // dessine chaque couche dans l'ordre
-            for (int i = 0; i < t->layerCount; i++)
+            for (int i = 0; i < t->layerCount; i++) //parcours toutes les couches de la tuile
             {
-                int idx = t->layers[i];
-                if (idx >= 0 && idx < gTileTextureCount)
+                int idx = t->layers[i]; //récupère l'index de la couche actuelle
+                if (idx >= 0 && idx < gTileTextureCount) //vérifie que l'index est valide
                 {
-                    DrawTexture(
+                    DrawTexture(   
                         gTileTextures[idx],
                         x * TILE_SIZE,
                         y * TILE_SIZE,

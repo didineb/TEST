@@ -22,14 +22,14 @@ int main(void)
     gTileTextures[3] = LoadTexture("assets/knight.png");
     gTileTextureCount = 4;
     
-    Board board = {0};
+    Board board = {0}; 
     GameInit(&board);
 
     while (!WindowShouldClose())
     {
-        float dt = GetFrameTime();
+        float dt = GetFrameTime(); 
 
-        GameUpdate(&board, dt);
+        GameUpdate(&board, dt); 
 
         BeginDrawing();
         ClearBackground(RAYWHITE);

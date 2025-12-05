@@ -28,8 +28,8 @@ typedef struct {
 extern Player gPlayer;  // joueur global
 
 
-void GameInit(Board *board);
-void GameUpdate(Board *board, float dt);
-void GameDraw(const Board *board);
+void GameInit(Board *board); // initialise le board
+void GameUpdate(Board *board, float dt); // mise à jour du jeu
+void GameDraw(const Board *board); // affichage du jeu
 
 #endif
