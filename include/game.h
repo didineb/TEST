@@ -32,9 +32,15 @@ typedef struct{
     int textureIndex;
 } Enemy;
 
+typedef struct{
+    int x, y;
+    int textureIndex;
+    int victoire;
+} Trophe;
 
 extern Player gPlayer;  // joueur global
 extern Enemy gEnemy;    // ennemi global
+extern Trophe gTrophe;
 
 void GameInit(Board *board); // initialise le board
 void GameUpdate(Board *board, float dt); // mise à jour du jeu

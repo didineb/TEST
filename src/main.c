@@ -4,6 +4,7 @@
 
 // Gestionnaire de texture
 Texture2D gTileTextures[6];
+Texture2D gTileTextures[6];
 int gTileTextureCount = 0;
 
 
@@ -13,6 +14,7 @@ int main(void)
     const int screenHeight = BOARD_ROWS * TILE_SIZE;
 
     InitWindow(screenWidth, screenHeight, "Knight Maze - PADARMA Edition");
+
     SetTargetFPS(60);
 
     // Chargement des textures
@@ -20,7 +22,7 @@ int main(void)
     gTileTextures[1] = LoadTexture("assets/wall.png");
     gTileTextures[2] = LoadTexture("assets/knight.png");
     gTileTextures[3] = LoadTexture("assets/skeleton.png");
-    gTileTextures[4] = LoadTexture("assets/attack.png");
+    gTileTextures[5] = LoadTexture("assets/trophy.png");
     gTileTextureCount = 6;
     
     Board board = {0}; 
@@ -42,6 +44,7 @@ int main(void)
         DrawText(TextFormat("Time : %.2f", time), 170, 10, 20, GREEN);
 
         DrawText(TextFormat("PV : %d", gPlayer.pv), 10, 40, 20, RED);
+        DrawText(TextFormat("Victoires : %d", gTrophe.victoire), 20, 80, 40, YELLOW);
 
         EndDrawing();
     }

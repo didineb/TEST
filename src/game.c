@@ -1,11 +1,12 @@
 #include "game.h"
 #include "stdlib.h"
 
+
 extern Texture2D gTileTextures[];
 extern int gTileTextureCount;
 Player gPlayer; // appel du joueur global
 Enemy gEnemy; // appel de l'ennemi global
-
+Trophe gTrophe;
 // ******************************************
 // ******************************************
 
@@ -80,7 +81,7 @@ void GameInit(Board *board)
     {
         for (int x = 0; x < BOARD_COLS; x++)
         {
-            Tile *t = &board->tiles[y][x];
+            Tile *t = &board->tiles[y][x]; //récupère la tuile actuelle
             TileClear(t);
 
             if (maze[y][x] == 1) // si la case est un mur
@@ -101,52 +102,60 @@ void GameInit(Board *board)
 
     gEnemy.x = 3;
     gEnemy.y = 1;
+    gEnemy.x = 3;
+    gEnemy.y = 1;
     gEnemy.textureIndex = 3;
 
+    gTrophe.x = 29;
+    gTrophe.y = 16;
+    gTrophe.victoire = 0;
+    gTrophe.textureIndex = 5;
+
+    TilePush(&board->tiles[gTrophe.y][gTrophe.x], 5);
     TilePush(&board->tiles[gEnemy.y][gEnemy.x], 3);
 
 }
 
 void GameUpdate(Board *board, float dt)
 {
-
     // Durée minimale entre deux mouvements (en secondes)
     float moveDelay = 0.15f;
     static float lastMoveTime = 0.0f;
 
-    float now = GetTime();   // temps en secondes depuis le lancement
-    
-    int nextX = gPlayer.x;  //va récupérer la position actuelle du joueur en x
+    // Gestion du Game Over
+    static bool gameOver = false;
+    static float gameOverTime = 0.0f;
+
+    if (gameOver)
+    {
+        // Après 0.9s, réinitialiser le jeu
+        if (GetTime() - gameOverTime >= 2.5f) 
+        {
+            GameInit(board);
+            gPlayer.pv = 3;
+            gameOver = false;
+        }
+        return; // pendant le Game Over, pas de déplacement
+    }
+
+    float now = GetTime();   // temps actuel
+    int nextX = gPlayer.x;
     int nextY = gPlayer.y;
 
-
-   // On agit seulement si le délai est écoulé
+    // Déplacement avec délai
     if (now - lastMoveTime >= moveDelay)
     {
-        if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) {
-            nextX++;
-            lastMoveTime = now;
-        }
-        else if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) {
-            nextX--;
-            lastMoveTime = now;
-        }
-        else if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) {
-            nextY--;
-            lastMoveTime = now;
-        }
-        else if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) {
-            nextY++;
-            lastMoveTime = now;
-        }
+        if (IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT)) { nextX++; lastMoveTime = now; }
+        else if (IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT)) { nextX--; lastMoveTime = now; }
+        else if (IsKeyDown(KEY_W) || IsKeyDown(KEY_UP)) { nextY--; lastMoveTime = now; }
+        else if (IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN)) { nextY++; lastMoveTime = now; }
     }
 
     // Récupère la tuile cible
     Tile *target = &board->tiles[nextY][nextX];
 
-    // limites du board pour ne pas sortir de l'écran
-    if (nextX < 0 || nextX >= BOARD_COLS || nextY < 0 || nextY >= BOARD_ROWS) 
-        return;
+    // Limites du board
+    if (nextX < 0 || nextX >= BOARD_COLS || nextY < 0 || nextY >= BOARD_ROWS) return;
 
     // appel de la fonction de vérification des tuiles et si la tuile cible est égale à 1 c'est alors un mur
     if (TileContains(target, 1))
@@ -157,34 +166,34 @@ void GameUpdate(Board *board, float dt)
 
     if (TileContains(target, 3))
     {
-        
-        gPlayer.pv -= 1; // le joueur perd 1 point de vie
-
+        gPlayer.pv--;
         if (gPlayer.pv == 0)
         {
-            // réinitialisation du jeu
-            GameInit(board);
-            return;
+            gameOver = true;
+            gameOverTime = GetTime(); // démarre le délai avant réinitialisation
         }
-        
-
+        return;
+    }
+    if (TileContains(target, 5)){
+        gTrophe.victoire += 1;
+        gPlayer.y = 1;
+        gPlayer.x = 1;
         return;
     }
 
-    // pas de collision → on valide le déplacement
+    // Déplacement validé
     gPlayer.x = nextX;
     gPlayer.y = nextY;
 }
 
 void GameDraw(const Board *board)
 {
-    for (int y = 0; y < BOARD_ROWS; y++) //parcours toutes les lignes
+    for (int y = 0; y < BOARD_ROWS; y++)
     {
-        for (int x = 0; x < BOARD_COLS; x++) //parcours toutes les colonnes
+        for (int x = 0; x < BOARD_COLS; x++)
         {
-            const Tile *t = &board->tiles[y][x]; //récupère la tuile actuelle
+            const Tile *t = &board->tiles[y][x];
 
-            // fond “vide” au cas où
             DrawRectangle(
                 x * TILE_SIZE,
                 y * TILE_SIZE,
@@ -192,17 +201,12 @@ void GameDraw(const Board *board)
                 TILE_SIZE,
                 LIGHTGRAY);
 
-            // dessine chaque couche dans l'ordre
-            for (int i = 0; i < t->layerCount; i++) //parcours toutes les couches de la tuile
+            for (int i = 0; i < t->layerCount; i++)
             {
-                int idx = t->layers[i]; //récupère l'index de la couche actuelle
-                if (idx >= 0 && idx < gTileTextureCount) //vérifie que l'index est valide
+                int idx = t->layers[i];
+                if (idx >= 0 && idx < gTileTextureCount)
                 {
-                    DrawTexture(   
-                        gTileTextures[idx],
-                        x * TILE_SIZE,
-                        y * TILE_SIZE,
-                        WHITE);
+                    DrawTexture(gTileTextures[idx], x * TILE_SIZE, y * TILE_SIZE, WHITE);
                 }
             }
 
@@ -223,11 +227,13 @@ void GameDraw(const Board *board)
         }
     }
 
-    // dessine le joueur au-dessus de tout
-    DrawTexture(
-        gTileTextures[gPlayer.textureIndex], //récupère la texture du joueur
-        gPlayer.x * TILE_SIZE, // position x en cases car multiplié par la taille d'une tuile
-        gPlayer.y * TILE_SIZE,
-        WHITE); //tint = filtre de couleur | WHITE signifie : dessiner l’image normalement.
+    // Dessine le joueur
+    DrawTexture(gTileTextures[gPlayer.textureIndex], gPlayer.x * TILE_SIZE, gPlayer.y * TILE_SIZE, WHITE);
 
+    // Affiche Game Over si nécessaire
+    static bool gameOver = false; // même flag que dans GameUpdate
+    if (gPlayer.pv == 0 || gameOver)
+    {
+        DrawText("GAME OVER", 80, 80, 40, RED);
+    }
 }
