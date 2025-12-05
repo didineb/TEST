@@ -1,6 +1,5 @@
 #include "game.h"
 #include "stdlib.h"
-#include "math.h"
 
 extern Texture2D gTileTextures[];
 extern int gTileTextureCount;
@@ -10,7 +9,7 @@ Enemy gEnemy; // appel de l'ennemi global
 // ******************************************
 // ******************************************
 
-int visionRadius = 5; // rayon de vision du joueur
+int visionRadius = 1; // rayon de vision du joueur
 
 static bool TileContains(const Tile *t, int texIndex) //fonction bool pour vérifier si une texture précise est présente dans une tuile
 {
@@ -204,6 +203,21 @@ void GameDraw(const Board *board)
                         y * TILE_SIZE,
                         WHITE);
                 }
+            }
+
+            // On calcule la distance simple (en cases)
+            int dx = abs(x - gPlayer.x);    // Combien la case est à droite ou à gauche du joueur (axe x)
+            int dy = abs(y - gPlayer.y);    // Combien la case est au-dessus ou en-dessous du joueur (axe y)
+
+            // Si dx ou dy dépasse le rayon de vision, on dessine un rectangle noir par-dessus
+            if (dx > visionRadius || dy > visionRadius)
+            {
+                DrawRectangle(
+                    x * TILE_SIZE,
+                    y * TILE_SIZE,
+                    TILE_SIZE,
+                    TILE_SIZE,
+                    BLACK);   // totalement opaque
             }
         }
     }
